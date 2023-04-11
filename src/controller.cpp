@@ -14,7 +14,7 @@ Controller::Controller(const std::string &binaryFileName, int messageCount)
 
 void Controller::movePointer(int& pointer) const
 {
-    if (pointer == maxMessageCount - 1)
+    if (pointer == maxMessageCount - 1) // -1 as pointer is in range (0, maxMessageCount - 1)
     {
         pointer = 0;
     }
