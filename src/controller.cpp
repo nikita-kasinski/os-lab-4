@@ -14,7 +14,14 @@ Controller::Controller(const std::string &binaryFileName, int messageCount)
 
 void Controller::movePointer(int& pointer) const
 {
-
+    if (pointer == maxMessageCount)
+    {
+        pointer = 0;
+    }
+    else
+    {
+        ++pointer;
+    }
 }
 bool Controller::postMessage(const std::string& message) const
 {
