@@ -7,7 +7,7 @@ private:
     std::string binaryFileName;
     int messageHead;
     int messageTail;
-    int messageCount;
+    int maxMessageCount;
     void movePointer(int& pointer) const;
 public:
     Controller(const std::string& binaryFileName, int messageCount);
