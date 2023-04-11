@@ -5,12 +5,13 @@ class Controller
 {
 private:
     std::string binaryFileName;
-    int messageHead;
-    int messageTail;
-    int maxMessageCount;
-    void movePointer(int& pointer) const;
+    size_t messageHead;
+    size_t messageTail;
+    size_t maxMessageCount;
+    void movePointer(size_t& pointer) const;
 public:
-    Controller(const std::string& binaryFileName, int messageCount);
+    Controller(const std::string& binaryFileName, size_t messageCount);
     bool postMessage(const std::string& message) const;
     std::string getMessage() const;
+    static void initBinaryFile(const std::string& binaryFileName, size_t maxMessageCount);
 };
