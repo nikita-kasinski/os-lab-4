@@ -27,13 +27,16 @@ size_t Controller::getHead(std::fstream& fin) const
     
     fin.seekp(0);
     size_t head;
-    fin.read((char*)&head, atomicOffset);
+    fin.read((char*)&head, atomicSize);
     return head;
 }
 
-size_t Controller:getTail(std::fstream& fin) const
+size_t Controller::getTail(std::fstream& fin) const
 {
-    
+    fin.seekp(0);
+    size_t tail;
+    fin.read((char*)&tail, atomicSize);
+    return tail;
 }
 void Controller::initBinaryFile(const std::string &binaryFileName, size_t maxMessageCount)
 {
@@ -58,7 +61,7 @@ bool Controller::postMessage(const std::string &message) const
 {
     assert(message.length() <= maxMessageSize);
     std::fstream fout(binaryFileName, std::ios::binary | std::ios::out | std::ios::in);
-    fout.seekp(messageTail * (maxMessageSize + 1));
+    //fout.seekp(messageTail * (maxMessageSize + 1));
     fout.write(message.c_str(), sizeof(message.c_str()));
     fout.close();
 }
