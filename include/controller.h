@@ -10,6 +10,7 @@ private:
     static const char dummyChar = '0';
     static const size_t atomicOffset = sizeof(size_t);
     static const size_t atomicSize = atomicOffset;
+    static const size_t overallOffset = 3 * atomicOffset;
 
     void movePointer(size_t& pointer) const;
 
@@ -19,9 +20,16 @@ private:
     //first - head, second - tail
     size_t getTail(std::fstream& fin) const;
 
+    size_t getMessageCount(std::fstream& fin) const;
+
     void moveHead(std::fstream& f) const;
-    
+
     void moveTail(std::fstream& f) const;
+
+    void increaseMessageCount(std::fstream& fout) const;
+
+    void decreaseMessageCount(std::fstream& fout) const;
+    
 public:
     Controller(const std::string& binaryFileName, size_t messageCount);
     bool postMessage(const std::string& message) const;
