@@ -36,6 +36,6 @@ private:
 public:
     Controller(const std::string& binaryFileName, size_t messageCount);
     bool postMessage(const std::string& message) const;
-    std::string getMessage() const;
+    bool getMessage(std::string& message) const;
     static void initBinaryFile(const std::string& binaryFileName, size_t maxMessageCount);
 };
