@@ -33,7 +33,7 @@ size_t Controller::getHead(std::fstream& fin) const
 
 size_t Controller::getTail(std::fstream& fin) const
 {
-    fin.seekp(0);
+    fin.seekp(atomicOffset);
     size_t tail;
     fin.read((char*)&tail, atomicSize);
     return tail;
@@ -61,7 +61,9 @@ bool Controller::postMessage(const std::string &message) const
 {
     assert(message.length() <= maxMessageSize);
     std::fstream fout(binaryFileName, std::ios::binary | std::ios::out | std::ios::in);
-    //fout.seekp(messageTail * (maxMessageSize + 1));
+    size_t tail = getTail(fout);
+    fout.seekp(tail);
     fout.write(message.c_str(), sizeof(message.c_str()));
+    moveTail(fout);
     fout.close();
 }
