@@ -46,6 +46,14 @@ void Controller::moveTail(std::fstream& f) const
     f.write((char*)&tail, atomicSize);
 }
 
+void Controller::moveHead(std::fstream& f) const
+{
+    size_t head = getHead(f);
+    movePointer(head);
+    f.seekp(0);
+    f.write((char*)&head, atomiceSize);
+}
+
 void Controller::initBinaryFile(const std::string &binaryFileName, size_t maxMessageCount)
 {
     std::fstream fout(binaryFileName, std::ios::binary | std::ios::out);
