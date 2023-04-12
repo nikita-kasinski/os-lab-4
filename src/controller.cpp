@@ -22,6 +22,19 @@ void Controller::movePointer(size_t &pointer) const
     }
 }
 
+size_t Controller::getHead(std::fstream& fin) const
+{
+    
+    fin.seekp(0);
+    size_t head;
+    fin.read((char*)&head, atomicOffset);
+    return head;
+}
+
+size_t Controller:getTail(std::fstream& fin) const
+{
+    
+}
 void Controller::initBinaryFile(const std::string &binaryFileName, size_t maxMessageCount)
 {
     std::fstream fout(binaryFileName, std::ios::binary | std::ios::out);
