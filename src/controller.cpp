@@ -132,3 +132,23 @@ bool Controller::postMessage(const std::string &message) const
         return false;
     }
 }
+
+bool Controller::getMessage(std::string& message) const
+{
+    std::fstream f(binaryFileName, std::ios::binary | std::ios::out | std::ios::in);
+    if (decreaseMessageCount(f))
+    {
+        size_t head = getHead(f);
+        char charMessage[maxMessageSize];
+
+        f.seekp(overallOffset + head * (maxMessageSize + 1));
+        f.read(charMessage, maxMessageSize);
+        message = std::string(charMessage);
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+
+}
