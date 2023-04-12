@@ -11,8 +11,8 @@ private:
     static const size_t atomicOffset = sizeof(size_t);
 
     void movePointer(size_t& pointer) const;
-    size_t getHead() const;
-    size_t getTail() const;
+    size_t getHead(std::fstream& fin) const;
+    size_t getTail(std::fstream& fin) const;
 public:
     Controller(const std::string& binaryFileName, size_t messageCount);
     bool postMessage(const std::string& message) const;
