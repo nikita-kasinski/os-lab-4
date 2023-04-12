@@ -89,7 +89,7 @@ bool Controller::decreaseMessageCount(std::fstream &f) const
     else
     {
         --messageCount;
-        f.write((char*)&(messageCount), atomicSize);
+        f.write((char *)&(messageCount), atomicSize);
         return true;
     }
 }
@@ -117,10 +117,18 @@ void Controller::initBinaryFile(const std::string &binaryFileName, size_t maxMes
 bool Controller::postMessage(const std::string &message) const
 {
     assert(message.length() <= maxMessageSize);
-    std::fstream fout(binaryFileName, std::ios::binary | std::ios::out | std::ios::in);
-    size_t tail = getTail(fout);
-    fout.seekp(overallOffset + tail * (maxMessageSize + 1));
-    fout.write(message.c_str(), sizeof(message.c_str()));
-    moveTail(fout);
-    fout.close();
+    std::fstream f(binaryFileName, std::ios::binary | std::ios::out | std::ios::in);
+    if (increaseMessageCount(f))
+    {
+        size_t tail = getTail(f);
+        f.seekp(overallOffset + tail * (maxMessageSize + 1));
+        f.write(message.c_str(), sizeof(message.c_str()));
+        moveTail(f);
+        f.close();
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
