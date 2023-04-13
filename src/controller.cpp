@@ -3,6 +3,7 @@
 #include <fstream>
 #include <iostream>
 #include <cassert>
+#include <limits>
 
 Controller::Controller(const std::string &binaryFileName, size_t messageCount)
 {
@@ -178,4 +179,32 @@ bool Controller::getMessage(std::string &message) const
     {
         return false;
     }
+}
+
+size_t Controller::safeUnsignedIntegerInput(std::istream &in, const std::string &inputPrompt, const std::string &inputFailedPrompt)
+{
+    constexpr auto maxStreamSize = std::numeric_limits<std::streamsize>::max();
+    int tempAns = -1;
+    bool failed = false;
+
+    while (tempAns <= 0)
+    {
+        if (failed)
+        {
+            std::cout << inputFailedPrompt;
+        }
+        else
+        {
+            failed = true;
+        }
+        std::cout << inputPrompt;
+        std::cin >> tempAns;
+        if (!std::cin.good())
+        {
+            std::cin.clear();
+            std::cin.ignore(maxStreamSize, '\n');
+            tempAns = -1;
+        }
+    }
+    return static_cast<size_t>(tempAns);
 }
