@@ -118,7 +118,7 @@ bool Controller::decreaseMessageCount(std::fstream &f) const
 
 void Controller::initBinaryFile(const std::string &binaryFileName, size_t maxMessageCount)
 {
-    std::fstream f(binaryFileName, std::ios::binary | std::ios::out);
+    std::fstream f(binaryFileName.c_str(), std::ios::binary | std::ios::out);
     std::string dummyString;
 
     for (size_t i = 0; i < maxMessageSize; ++i)
@@ -142,15 +142,12 @@ void Controller::initBinaryFile(const std::string &binaryFileName, size_t maxMes
 bool Controller::postMessage(const std::string &message) const
 {
     assert(message.length() <= maxMessageSize);
-    std::fstream f(binaryFileName, std::ios::binary | std::ios::out | std::ios::in);
+    std::fstream f(binaryFileName.c_str(), std::ios::binary | std::ios::out | std::ios::in);
     if (increaseMessageCount(f))
     {
         size_t tail = getTail(f);
         f.clear();
         f.seekp(overallOffset + tail * (maxMessageSize + 1));
-        std::cout << "Tail: " << tail << "\n";
-        std::cout << "Message pos: " << overallOffset + tail * (maxMessageSize + 1) << "\n";
-        std::cout << "Message: " << message.c_str() << ", size: " << sizeof(message.c_str()) << "\n";
         f.write(message.c_str(), message.length() + 1);
         moveTail(f);
         f.close();
@@ -165,15 +162,13 @@ bool Controller::postMessage(const std::string &message) const
 
 bool Controller::getMessage(std::string &message) const
 {
-    std::fstream f(binaryFileName, std::ios::binary | std::ios::out | std::ios::in);
+    std::fstream f(binaryFileName.c_str(), std::ios::binary | std::ios::out | std::ios::in);
     if (decreaseMessageCount(f))
     {
         size_t head = getHead(f);
         char charMessage[maxMessageSize + 1];
-        std::cout << "Head: " << head << "\n";
         f.clear();
         f.seekg(overallOffset + head * (maxMessageSize + 1));
-        std::cout << "Message pos: " << overallOffset + head * (maxMessageSize + 1) << "\n";
         f.read(charMessage, maxMessageSize + 1);
         message = std::string(charMessage);
         moveHead(f);
