@@ -1,8 +1,21 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <sstream>
 #include "controller.h"
 #include "windows.h"
+
+BOOL StartSender(const std::string& binaryFile, PROCESS_INFORMATION& pi, size_t id)
+{
+    STARTUPINFO si;
+    ZeroMemory(&si, sizeof(STARTUPINFO));
+    si.cb = sizeof(STARTUPINFO);
+
+    std::ostringstream consoleCommand;
+    std::string sender = "sender.exe";
+    consoleCommand << sender << " " << binaryFile << " " << id;
+    return CreateProcessA(NULL, const_cast<char*>(consoleCommand.str().c_str()), NULL, NULL, FALSE, CREATE_NEW_CONSOLE, NULL, NULL, &si, &pi);
+}
 
 int main()
 {
@@ -31,6 +44,22 @@ int main()
 
     HANDLE *sendMessageEvents = new HANDLE[numberOfSenders];
     PROCESS_INFORMATION *senders = new PROCESS_INFORMATION[numberOfSenders];
+
+    for (size_t i = 0; i < numberOfSenders; ++i)
+    {
+        std::ostringstream eventName;
+        eventName << "Send message " << i;
+        sendMessageEvents[i] = CreateEvent(NULL, TRUE, FALSE, eventName.str().c_str());
+        if (!StartSender(binaryFile, senders[i], i))
+        {
+            std::cerr << "Error " << GetLastError() << "\n";
+            std::cerr << "Unable to create sender " << i << ". Abort\n";
+            return 0;
+        }
+    }
+
+    std::cin.get();
+    std::cin.get();
 
     for (size_t i = 0; i < numberOfSenders; ++i)
     {
