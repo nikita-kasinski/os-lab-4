@@ -10,6 +10,21 @@ Controller::Controller(const std::string &binaryFileName, size_t messageCount)
     this->maxMessageCount = messageCount;
 }
 
+void Controller::outBinFile(std::fstream &f)
+{
+
+    std::cout << "\n---------------------\n";
+    std::cout << f.fail() << f.bad() << f.eof() << "\n";
+    f.seekg(0);
+    while (f.good())
+    {
+        char x;
+        f.read(&x, 1);
+        std::cout << (int)x << ' ';
+    }
+    std::cout << "\n---------------------\n";
+}
+
 void Controller::movePointer(size_t &pointer) const
 {
     if (pointer == maxMessageCount - 1) // -1 as pointer is in range (0, maxMessageCount - 1)
@@ -22,27 +37,30 @@ void Controller::movePointer(size_t &pointer) const
     }
 }
 
-size_t Controller::getHead(std::fstream &fin) const
+size_t Controller::getHead(std::fstream &f) const
 {
-    fin.seekp(headOffset);
     size_t head;
-    fin.read((char *)&head, atomicSize);
+    f.clear();
+    f.seekg(headOffset);
+    f.read(reinterpret_cast<char *>(&head), atomicSize);
     return head;
 }
 
-size_t Controller::getTail(std::fstream &fin) const
+size_t Controller::getTail(std::fstream &f) const
 {
-    fin.seekp(tailOffset);
     size_t tail;
-    fin.read((char *)&tail, atomicSize);
+    f.clear();
+    f.seekg(tailOffset);
+    f.read(reinterpret_cast<char *>(&tail), atomicSize);
     return tail;
 }
 
-size_t Controller::getMessageCount(std::fstream &fin) const
+size_t Controller::getMessageCount(std::fstream &f) const
 {
-    fin.seekp(messageCountOffset);
     size_t messageCount;
-    fin.read((char *)&messageCount, atomicSize);
+    f.clear();
+    f.seekg(messageCountOffset);
+    f.read(reinterpret_cast<char *>(&messageCount), atomicSize);
     return messageCount;
 }
 
@@ -50,21 +68,24 @@ void Controller::moveTail(std::fstream &f) const
 {
     size_t tail = getTail(f);
     movePointer(tail);
+    f.clear();
     f.seekp(tailOffset);
-    f.write((char *)&tail, atomicSize);
+    f.write(reinterpret_cast<char *>(&tail), atomicSize);
 }
 
 void Controller::moveHead(std::fstream &f) const
 {
     size_t head = getHead(f);
     movePointer(head);
+    f.clear();
     f.seekp(headOffset);
-    f.write((char *)&head, atomicSize);
+    f.write(reinterpret_cast<char *>(&head), atomicSize);
 }
 
 bool Controller::increaseMessageCount(std::fstream &f) const
 {
     size_t messageCount = getMessageCount(f);
+    f.clear();
     f.seekp(messageCountOffset);
     if (messageCount == maxMessageCount)
     {
@@ -73,7 +94,7 @@ bool Controller::increaseMessageCount(std::fstream &f) const
     else
     {
         ++messageCount;
-        f.write((char *)&(messageCount), atomicSize);
+        f.write(reinterpret_cast<char *>(&messageCount), atomicSize);
         return true;
     }
 }
@@ -81,6 +102,7 @@ bool Controller::increaseMessageCount(std::fstream &f) const
 bool Controller::decreaseMessageCount(std::fstream &f) const
 {
     size_t messageCount = getMessageCount(f);
+    f.clear();
     f.seekp(messageCountOffset);
     if (messageCount == 0)
     {
@@ -89,29 +111,32 @@ bool Controller::decreaseMessageCount(std::fstream &f) const
     else
     {
         --messageCount;
-        f.write((char *)&(messageCount), atomicSize);
+        f.write(reinterpret_cast<char *>(&messageCount), atomicSize);
         return true;
     }
 }
 
 void Controller::initBinaryFile(const std::string &binaryFileName, size_t maxMessageCount)
 {
-    std::fstream fout(binaryFileName, std::ios::binary | std::ios::out);
+    std::fstream f(binaryFileName, std::ios::binary | std::ios::out);
     std::string dummyString;
 
     for (size_t i = 0; i < maxMessageSize; ++i)
     {
         dummyString += dummyChar;
     }
-
     // first - head, second - tail, third - messageCount,  then messages
-    fout.write(0, atomicSize);
-    fout.write(0, atomicSize);
-    fout.write(0, atomicSize);
+    size_t zero = 0;
+    f.clear();
+    f.seekp(0);
+    f.write(reinterpret_cast<char *>(&zero), atomicSize);
+    f.write(reinterpret_cast<char *>(&zero), atomicSize);
+    f.write(reinterpret_cast<char *>(&zero), atomicSize);
     for (size_t i = 0; i < maxMessageCount; ++i)
     {
-        fout.write(dummyString.c_str(), sizeof(dummyString.c_str()));
+        f.write(dummyString.c_str(), dummyString.length() + 1);
     }
+    f.close();
 }
 
 bool Controller::postMessage(const std::string &message) const
@@ -121,34 +146,41 @@ bool Controller::postMessage(const std::string &message) const
     if (increaseMessageCount(f))
     {
         size_t tail = getTail(f);
+        f.clear();
         f.seekp(overallOffset + tail * (maxMessageSize + 1));
-        f.write(message.c_str(), sizeof(message.c_str()));
+        std::cout << "Tail: " << tail << "\n";
+        std::cout << "Message pos: " << overallOffset + tail * (maxMessageSize + 1) << "\n";
+        std::cout << "Message: " << message.c_str() << ", size: " << sizeof(message.c_str()) << "\n";
+        f.write(message.c_str(), message.length() + 1);
         moveTail(f);
         f.close();
         return true;
     }
     else
     {
+        f.close();
         return false;
     }
 }
 
-bool Controller::getMessage(std::string& message) const
+bool Controller::getMessage(std::string &message) const
 {
     std::fstream f(binaryFileName, std::ios::binary | std::ios::out | std::ios::in);
     if (decreaseMessageCount(f))
     {
         size_t head = getHead(f);
-        char charMessage[maxMessageSize];
-
-        f.seekp(overallOffset + head * (maxMessageSize + 1));
-        f.read(charMessage, maxMessageSize);
+        char charMessage[maxMessageSize + 1];
+        std::cout << "Head: " << head << "\n";
+        f.clear();
+        f.seekg(overallOffset + head * (maxMessageSize + 1));
+        std::cout << "Message pos: " << overallOffset + head * (maxMessageSize + 1) << "\n";
+        f.read(charMessage, maxMessageSize + 1);
         message = std::string(charMessage);
+        moveHead(f);
         return true;
     }
     else
     {
         return false;
     }
-
 }
