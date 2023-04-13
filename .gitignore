@@ -1,5 +1,7 @@
 bin/*
 obj/*
+cov/*
 .vscode/*
 *.txt
 testfile
+coverage.info
