@@ -1,15 +1,14 @@
 #include <iostream>
 #include <string>
 #include <fstream>
-#include <limits>
 #include "controller.h"
 
 int main()
 {
     std::string binaryFile;
-    int maxMessageCount = -1;
-    constexpr auto maxStreamSize = std::numeric_limits<std::streamsize>::max();
-
+    size_t maxMessageCount;
+    size_t numberOfSenders;
+    
     std::cout << "Input binary file name: ";
     std::cin >> binaryFile;
 
@@ -17,27 +16,18 @@ int main()
         // retreiving maxMessageCount
         std::string maxMessageCountPrompt = "Enter maximum message count: ";
         std::string maxMessageCountFailedPrompt = "Input must be positive integer. Try again\n";
-
-        bool failed = false;
-        while (maxMessageCount <= 0)
-        {
-            if (failed)
-            {
-                std::cout << maxMessageCountFailedPrompt;
-            }
-            else
-            {
-                failed = true;
-            }
-            std::cout << maxMessageCountPrompt;
-            std::cin >> maxMessageCount;
-            if (!std::cin.good())
-            {
-                std::cin.clear();
-                std::cin.ignore(maxStreamSize, '\n');
-                maxMessageCount  = -1;
-            }
-        }
+        maxMessageCount = Controller::safeUnsignedIntegerInput(std::cin, maxMessageCountPrompt, maxMessageCountFailedPrompt);
     }
+
+    Controller::initBinaryFile(binaryFile, static_cast<size_t>(maxMessageCount));
+
+    {
+        // retreiving number of Senders
+
+        std::string numberOfSendersPrompt = "Enter number of sender processes: ";
+        std::string numberOfSendersFailedPrompt = "Input must be positive integer. Try adain\n";
+        numberOfSenders = Controller::safeUnsignedIntegerInput(std::cin, numberOfSendersPrompt, numberOfSendersFailedPrompt);
+    }
+
     return 0;
 }
