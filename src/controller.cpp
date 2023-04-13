@@ -5,10 +5,9 @@
 #include <cassert>
 #include <limits>
 
-Controller::Controller(const std::string &binaryFileName, size_t messageCount)
+Controller::Controller(const std::string &binaryFileName)
 {
     this->binaryFileName = binaryFileName;
-    this->maxMessageCount = messageCount;
 }
 
 void Controller::outBinFile(std::fstream &f)
@@ -26,8 +25,9 @@ void Controller::outBinFile(std::fstream &f)
     std::cout << "\n---------------------\n";
 }
 
-void Controller::movePointer(size_t &pointer) const
+void Controller::movePointer(std::fstream &f, size_t &pointer) const
 {
+    size_t maxMessageCount = getMaxMessageCount(f);
     if (pointer == maxMessageCount - 1) // -1 as pointer is in range (0, maxMessageCount - 1)
     {
         pointer = 0;
@@ -65,10 +65,19 @@ size_t Controller::getMessageCount(std::fstream &f) const
     return messageCount;
 }
 
+size_t Controller::getMaxMessageCount(std::fstream &f) const
+{
+    size_t maxMessageCount;
+    f.clear();
+    f.seekg(maxMessageCountOffset);
+    f.read(reinterpret_cast<char *>(&maxMessageCount), atomicSize);
+    return maxMessageCount;
+}
+
 void Controller::moveTail(std::fstream &f) const
 {
     size_t tail = getTail(f);
-    movePointer(tail);
+    movePointer(f, tail);
     f.clear();
     f.seekp(tailOffset);
     f.write(reinterpret_cast<char *>(&tail), atomicSize);
@@ -77,7 +86,7 @@ void Controller::moveTail(std::fstream &f) const
 void Controller::moveHead(std::fstream &f) const
 {
     size_t head = getHead(f);
-    movePointer(head);
+    movePointer(f, head);
     f.clear();
     f.seekp(headOffset);
     f.write(reinterpret_cast<char *>(&head), atomicSize);
@@ -86,6 +95,7 @@ void Controller::moveHead(std::fstream &f) const
 bool Controller::increaseMessageCount(std::fstream &f) const
 {
     size_t messageCount = getMessageCount(f);
+    size_t maxMessageCount = getMaxMessageCount(f);
     f.clear();
     f.seekp(messageCountOffset);
     if (messageCount == maxMessageCount)
@@ -126,13 +136,14 @@ void Controller::initBinaryFile(const std::string &binaryFileName, size_t maxMes
     {
         dummyString += dummyChar;
     }
-    // first - head, second - tail, third - messageCount,  then messages
+    // first - head, second - tail, third - messageCount,  forth - maxMessageCount then messages
     size_t zero = 0;
     f.clear();
     f.seekp(0);
     f.write(reinterpret_cast<char *>(&zero), atomicSize);
     f.write(reinterpret_cast<char *>(&zero), atomicSize);
     f.write(reinterpret_cast<char *>(&zero), atomicSize);
+    f.write(reinterpret_cast<char *>(&maxMessageCount), atomicSize);
     for (size_t i = 0; i < maxMessageCount; ++i)
     {
         f.write(dummyString.c_str(), dummyString.length() + 1);
