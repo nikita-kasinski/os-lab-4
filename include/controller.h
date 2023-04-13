@@ -42,4 +42,5 @@ public:
     bool postMessage(const std::string &message) const;
     bool getMessage(std::string &message) const;
     static void initBinaryFile(const std::string &binaryFileName, size_t maxMessageCount);
+    static size_t safeUnsignedIntegerInput(std::istream &in, const std::string &inputPrompt, const std::string &inputFailedPrompt);
 };
