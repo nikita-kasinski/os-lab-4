@@ -18,13 +18,13 @@ private:
     static const size_t overallOffset = 3 * atomicOffset;
 
     static void outBinFile(std::fstream &f);
-    
+
     void movePointer(size_t &pointer) const;
 
-    // first - head, second - tail
+    // first - head, second - tail, third - messageCount
     size_t getHead(std::fstream &fin) const;
 
-    // first - head, second - tail
+    // first - head, second - tail, third - messageCount
     size_t getTail(std::fstream &fin) const;
 
     size_t getMessageCount(std::fstream &fin) const;
