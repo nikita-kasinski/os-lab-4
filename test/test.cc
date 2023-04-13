@@ -18,7 +18,7 @@ TEST(TestPostMessage, TestFullCapacity)
     const int maxMessageCount = 5;
     ensureTestFileExists();
     Controller::initBinaryFile(testFile, maxMessageCount);
-    Controller ctrl(testFile, maxMessageCount);
+    Controller ctrl(testFile);
     for (size_t i = 0; i < maxMessageCount; ++i)
     {
         std::ostringstream message;
@@ -33,7 +33,7 @@ TEST(TestPostMessage, TestWritingInAvailableSlot)
     const int maxMessageCount = 3;
     ensureTestFileExists();
     Controller::initBinaryFile(testFile, maxMessageCount);
-    Controller ctrl(testFile, maxMessageCount);
+    Controller ctrl(testFile);
     for (size_t i = 0; i < maxMessageCount; ++i)
     {
         std::ostringstream message;
@@ -61,7 +61,7 @@ TEST(TestGetMessage, TestSingleMessage)
 {
     const int maxMessageCount = 5;
     Controller::initBinaryFile(testFile, maxMessageCount);
-    Controller ctrl(testFile, maxMessageCount);
+    Controller ctrl(testFile);
     std::string messagePosted;
     std::string messageRead;
 
@@ -76,7 +76,7 @@ TEST(TestFIFOStructure, TestGetAndPostMessage)
     const int maxMessageCount = 10;
     const int numberOfIterations = 113;
     Controller::initBinaryFile(testFile, maxMessageCount);
-    Controller ctrl(testFile, maxMessageCount);
+    Controller ctrl(testFile);
     for (size_t i = 0; i < numberOfIterations; ++i)
     {
         std::ostringstream message;
@@ -92,7 +92,7 @@ TEST(TestGetMessage, TestNoMessage)
 {
     const int maxMessageCount = 5;
     Controller::initBinaryFile(testFile, maxMessageCount);
-    Controller ctrl(testFile, maxMessageCount);
+    Controller ctrl(testFile);
     std::string messageRead;
     std::string message = "abacaba";
     ASSERT_FALSE(ctrl.getMessage(messageRead));
