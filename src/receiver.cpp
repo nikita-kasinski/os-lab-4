@@ -30,7 +30,7 @@ int main()
         // retreiving maxMessageCount
         std::string maxMessageCountPrompt = "Enter maximum message count: ";
         std::string maxMessageCountFailedPrompt = "Input must be positive integer. Try again\n";
-        maxMessageCount = Controller::safeUnsignedIntegerInput(std::cin, maxMessageCountPrompt, maxMessageCountFailedPrompt);
+        maxMessageCount = Controller::safeUnsignedIntegerInput(std::cin, std::cout, maxMessageCountPrompt, maxMessageCountFailedPrompt);
     }
 
     Controller::initBinaryFile(binaryFile, maxMessageCount);
@@ -39,7 +39,7 @@ int main()
         // retreiving number of Senders
         std::string numberOfSendersPrompt = "Enter number of sender processes: ";
         std::string numberOfSendersFailedPrompt = "Input must be positive integer. Try again\n";
-        numberOfSenders = Controller::safeUnsignedIntegerInput(std::cin, numberOfSendersPrompt, numberOfSendersFailedPrompt);
+        numberOfSenders = Controller::safeUnsignedIntegerInput(std::cin, std::cout, numberOfSendersPrompt, numberOfSendersFailedPrompt);
     }
 
     HANDLE *sendMessageEvents = new HANDLE[numberOfSenders];

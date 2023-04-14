@@ -192,7 +192,7 @@ bool Controller::getMessage(std::string &message) const
     }
 }
 
-size_t Controller::safeUnsignedIntegerInput(std::istream &in, const std::string &inputPrompt, const std::string &inputFailedPrompt)
+size_t Controller::safeUnsignedIntegerInput(std::istream &in, std::ostream &out, const std::string &inputPrompt, const std::string &inputFailedPrompt)
 {
     constexpr auto maxStreamSize = std::numeric_limits<std::streamsize>::max();
     int tempAns = -1;
@@ -202,18 +202,18 @@ size_t Controller::safeUnsignedIntegerInput(std::istream &in, const std::string 
     {
         if (failed)
         {
-            std::cout << inputFailedPrompt;
+            out << inputFailedPrompt;
         }
         else
         {
             failed = true;
         }
-        std::cout << inputPrompt;
-        std::cin >> tempAns;
-        if (!std::cin.good())
+        out << inputPrompt;
+        in >> tempAns;
+        if (!in.good())
         {
-            std::cin.clear();
-            std::cin.ignore(maxStreamSize, '\n');
+            in.clear();
+            in.ignore(maxStreamSize, '\n');
             tempAns = -1;
         }
     }
