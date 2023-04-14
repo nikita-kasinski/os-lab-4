@@ -22,14 +22,14 @@ int main(int argc, char** argv)
     HANDLE iomtx = OpenMutexA(MUTEX_MODIFY_STATE, FALSE, "IO mutex");
     HANDLE fmtx = OpenMutexA(MUTEX_MODIFY_STATE, FALSE, "File mutex");
     
-    std::string menuPrompt = "Enter respective symbol:\nq to quit\n m to message the receiver\n";
+    std::string menuPrompt = "Enter respective symbol:\nq to quit\nm to message the receiver\n";
     std::string senderPrompt = "Sender ";
     std::string messagePrompt = "Enter message: ";
     std::string response;
 
     while(true)
     {
-        std::cout << senderPrompt << id << "." << menuPrompt;
+        std::cout << senderPrompt << id << ". " << menuPrompt;
         std::cin >> response;
         if (response == "q")
         {
