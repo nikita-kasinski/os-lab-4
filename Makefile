@@ -5,12 +5,11 @@ objR = obj/receiver.o
 objS = obj/sender.o
 obj = obj/controller.o
 objT = obj/test.o obj/tcontroller.o
-coverageObj = obj/tcontroller.gcda
 CC = g++
 CPPFLAGS = -std=c++17 -Wall -Iinclude
 TESTLIB = -lgtest -lgtest_main -lgcov
 COVERAGE = -fprofile-arcs -ftest-coverage
-.PHONY = dirs run build clean test report cleab_coverage
+.PHONY = dirs run build clean test report clean_coverage
 # run and build recipes
 run: dirs $(EXECR) $(EXECS)
 	./$(EXECR)
