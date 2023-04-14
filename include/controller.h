@@ -17,7 +17,7 @@ private:
     static const size_t maxMessageCountOffset = 3 * atomicOffset;
     static const size_t overallOffset = 4 * atomicOffset;
 
-    static void outBinFile(std::fstream &f);
+    //static void outBinFile(std::fstream &f);
 
     void movePointer(std::fstream &f, size_t &pointer) const;
 

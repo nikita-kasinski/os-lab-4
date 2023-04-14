@@ -10,7 +10,7 @@ Controller::Controller(const std::string &binaryFileName)
     this->binaryFileName = binaryFileName;
 }
 
-void Controller::outBinFile(std::fstream &f)
+/*void Controller::outBinFile(std::fstream &f)
 {
 
     std::cout << "\n---------------------\n";
@@ -23,7 +23,7 @@ void Controller::outBinFile(std::fstream &f)
         std::cout << (int)x << ' ';
     }
     std::cout << "\n---------------------\n";
-}
+}*/
 
 void Controller::movePointer(std::fstream &f, size_t &pointer) const
 {
