@@ -63,7 +63,7 @@ int main()
 
     WaitForMultipleObjects(numberOfSenders, sendMessageEvents, TRUE, INFINITE); // wait for all senders for the first time
 
-    std::string menuPrompt = "Enter respective symbol.\n q to quit\nr to read message\n";
+    std::string menuPrompt = "Enter respective symbol:\nq to quit\nr to read message\n";
     std::string receiverPrompt = "Receiver";
     std::string response;
     Controller ctrl(binaryFile);
@@ -87,6 +87,10 @@ int main()
             {
                 std::cout << receiverPrompt << " read message: " << messageRead << "\n";
                 SetEvent(readEvent);
+                for (size_t i = 0; i < numberOfSenders; ++i)
+                {
+                    ResetEvent(sendMessageEvents[i]);
+                }
             }
             else
             {
