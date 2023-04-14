@@ -100,3 +100,38 @@ TEST(TestGetMessage, TestNoMessage)
     ASSERT_TRUE(ctrl.getMessage(messageRead));
     ASSERT_EQ(messageRead, message);
 }
+
+TEST(TestSafeUnsignedIntegerInput, TestStandardInput)
+{
+    std::istringstream testStream("1 2 3 4\n");
+    std::ostringstream ostream;
+    size_t a, b, c, d;
+    a = Controller::safeUnsignedIntegerInput(testStream, ostream, "", "");
+    b = Controller::safeUnsignedIntegerInput(testStream, ostream, "", "");
+    c = Controller::safeUnsignedIntegerInput(testStream, ostream, "", "");
+    d = Controller::safeUnsignedIntegerInput(testStream, ostream, "", "");
+    EXPECT_EQ(a, 1);
+    EXPECT_EQ(b, 2);
+    EXPECT_EQ(c, 3);
+    EXPECT_EQ(d, 4);
+}
+
+TEST(TestSafeUnsignedIntegerInput, TestFailedInput)
+{
+    std::istringstream testStream("asdfbsda1\n2 sadgsadg123gasd\n 3\n");
+    std::ostringstream ostream;
+    size_t a, b;
+    a = Controller::safeUnsignedIntegerInput(testStream, ostream, "", "");
+    b = Controller::safeUnsignedIntegerInput(testStream, ostream, "", "");
+    EXPECT_EQ(a, 2);
+    EXPECT_EQ(b, 3);
+}
+
+TEST(TestSafeUnsignedIntegerInput, TestNegativeInput)
+{
+    std::istringstream testStream("skldghuhasdkjgn\n -1 \n2\n");
+    std::ostringstream ostream;
+    size_t a;
+    a = Controller::safeUnsignedIntegerInput(testStream, ostream, "", "");
+    EXPECT_EQ(a, 2);
+}
