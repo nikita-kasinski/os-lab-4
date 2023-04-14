@@ -41,15 +41,22 @@ int main(int argc, char** argv)
 
             std::cout << messagePrompt;
             std::cin >> message;
+            if (message.length() > 20)
+            {
+                std::cout << "Message must be no longer than 20. Skipping\n";
+            }
+            std::cout << senderPrompt << id << " is waiting for the file to become available\n";
             WaitForSingleObject(fmtx, INFINITE);
             // now we can work with the file safely
             if (ctrl.postMessage(message))
             {
                 // message posted successfully
+                std::cout << "Message posted successfully\n";
                 SetEvent(sendEvent);
             }
             else
             {
+                std::cout << "Message wasn't posted as file is full.\n";
                 ResetEvent(readEvent);
                 WaitForSingleObject(readEvent, INFINITE); // waiting for message to be read
             }
