@@ -58,6 +58,7 @@ int main(int argc, char** argv)
             {
                 std::cout << "Message wasn't posted as file is full.\n";
                 ResetEvent(readEvent);
+                std::cout << "Waiting for message to be read\n";
                 WaitForSingleObject(readEvent, INFINITE); // waiting for message to be read
             }
             ReleaseMutex(fmtx);
