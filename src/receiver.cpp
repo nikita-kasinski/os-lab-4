@@ -44,12 +44,15 @@ int main()
 
     HANDLE *sendMessageEvents = new HANDLE[numberOfSenders];
     PROCESS_INFORMATION *senders = new PROCESS_INFORMATION[numberOfSenders];
+    HANDLE readEvent = CreateEventA(NULL, TRUE, FALSE, "Got message");
+    HANDLE iomtx = CreateMutexA(NULL, FALSE, "IO mutex");
+    HANDLE fmtx = CreateMutexA(NULL, FALSE, "File mutex");
 
     for (size_t i = 0; i < numberOfSenders; ++i)
     {
         std::ostringstream eventName;
-        eventName << "Send message " << i;
-        sendMessageEvents[i] = CreateEvent(NULL, TRUE, FALSE, eventName.str().c_str());
+        eventName << "Sent message " << i;
+        sendMessageEvents[i] = CreateEventA(NULL, TRUE, FALSE, eventName.str().c_str());
         if (!StartSender(binaryFile, senders[i], i))
         {
             std::cerr << "Error " << GetLastError() << "\n";
@@ -58,8 +61,7 @@ int main()
         }
     }
 
-    std::cin.get();
-    std::cin.get();
+    WaitForMultipleObjects(numberOfSenders, sendMessageEvents, TRUE, INFINITE); // wait for all senders for the first time
 
     for (size_t i = 0; i < numberOfSenders; ++i)
     {
@@ -67,6 +69,8 @@ int main()
         CloseHandle(senders[i].hThread);
         CloseHandle(senders[i].hProcess);
     }
+    CloseHandle(iomtx);
+    CloseHandle(fmtx);
     delete[] sendMessageEvents;
     delete[] senders;
     return 0;
