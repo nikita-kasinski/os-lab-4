@@ -53,6 +53,7 @@ int main(int argc, char** argv)
                 ResetEvent(readEvent);
                 WaitForSingleObject(readEvent, INFINITE); // waiting for message to be read
             }
+            ReleaseMutex(fmtx);
         }
         else
         {
