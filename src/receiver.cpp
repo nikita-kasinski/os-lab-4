@@ -85,6 +85,7 @@ int main()
             std::string messageRead;
             if (ctrl.getMessage(messageRead))
             {
+                ReleaseMutex(fmtx);
                 std::cout << receiverPrompt << " read message: " << messageRead << "\n";
                 SetEvent(readEvent);
                 for (size_t i = 0; i < numberOfSenders; ++i)
@@ -94,6 +95,7 @@ int main()
             }
             else
             {
+                ReleaseMutex(fmtx);
                 std::cout << receiverPrompt << " failed to read message as file is empty\n";
                 std::cout << receiverPrompt << " is waiting for message to appear in file\n";
                 WaitForMultipleObjects(numberOfSenders, sendMessageEvents, FALSE, INFINITE);
@@ -103,6 +105,7 @@ int main()
         {
             std::cout << "Unknown option " << response << ". Try again\n";
         }
+        std::cout << "\n";
     }
 
     for (size_t i = 0; i < numberOfSenders; ++i)
