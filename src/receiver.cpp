@@ -63,6 +63,44 @@ int main()
 
     WaitForMultipleObjects(numberOfSenders, sendMessageEvents, TRUE, INFINITE); // wait for all senders for the first time
 
+    std::string menuPrompt = "Enter respective symbol.\n q to quit\nr to read message\n";
+    std::string receiverPrompt = "Receiver";
+    std::string response;
+    Controller ctrl(binaryFile);
+
+    while(true)
+    {
+        std::cout << receiverPrompt << ". " << menuPrompt;
+        std::cin >> response;
+        if (response == "q")
+        {
+            break;
+        }
+        else if (response == "r")
+        {
+            std::cout << receiverPrompt << " is waiting for file to become available\n";
+            WaitForSingleObject(fmtx, INFINITE);
+            // safe work with file
+
+            std::string messageRead;
+            if (ctrl.getMessage(messageRead))
+            {
+                std::cout << receiverPrompt << " read message: " << messageRead << "\n";
+                SetEvent(readEvent);
+            }
+            else
+            {
+                std::cout << receiverPrompt << " failed to read message as file is empty\n";
+                std::cout << receiverPrompt << " is waiting for message to appear in file\n";
+                WaitForMultipleObjects(numberOfSenders, sendMessageEvents, FALSE, INFINITE);
+            }
+        }
+        else 
+        {
+            std::cout << "Unknown option " << response << ". Try again\n";
+        }
+    }
+
     for (size_t i = 0; i < numberOfSenders; ++i)
     {
         CloseHandle(sendMessageEvents[i]);
